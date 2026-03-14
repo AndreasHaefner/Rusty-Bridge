@@ -1,0 +1,52 @@
+/* Card Container */
+.hand-view {
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 20px;
+    margin: 10px;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.hand-title {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #f5f5f5;
+    font-size: 1.5rem;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+
+/* Die einzelne Karte */
+.card-item {
+    background: white;
+    padding: 8px;
+    border-radius: 8px;
+    width: 80px;
+    height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-weight: 800;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    border: 1px solid #ddd;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Hier ersetzen wir dein JavaScript mit purem CSS! */
+.card-item:hover {
+    transform: translateY(-10px) scale(1.05);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.card-symbol { font-size: 1.4rem; line-height: 1; }
+.card-rank { font-size: 1.8rem; align-self: center; }
+.rotate-180 { transform: rotate(180deg); }

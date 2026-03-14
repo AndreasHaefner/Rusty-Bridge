@@ -1,0 +1,4 @@
+[build]
+# Wenn du einen public-Ordner hast, der immer kopiert werden soll:
+# (Die Option 'copy-public-assets' kopiert alles aus dem public Ordner)
+copy-public-assets = true

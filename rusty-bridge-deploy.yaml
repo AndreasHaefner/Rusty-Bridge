@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  bridge_backend:
+    image: ghcr.io/andreashaefner/rusty_bridge/backend:latest
+    networks:
+      - proxy
+      - bridge_net
+    environment:
+      - DATABASE_URL=postgres://bridge_user:secret_password@postgres:5432/bridge_db
+      - REDIS_URL=redis://redis:6379
+      - RUST_LOG=info
+    depends_on:
+      - postgres
+      - redis
+
+  postgres:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=bridge_user
+      - POSTGRES_PASSWORD=secret_password
+      - POSTGRES_DB=bridge_db
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - bridge_net
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+    networks:
+      - bridge_net
+
+  bridge_frontend:
+    image: ghcr.io/andreashaefner/rusty_bridge/frontend:latest
+    networks:
+      - proxy
+    deploy:
+      replicas: 1
+      
+networks:
+  proxy:
+    external: true
+  bridge_net:
+    driver: overlay 
+
+volumes:
+  pg_data:
