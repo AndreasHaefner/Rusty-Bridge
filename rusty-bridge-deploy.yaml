@@ -25,6 +25,8 @@ services:
       - pg_data:/var/lib/postgresql/data
     networks:
       - bridge_net
+      #same net as my grafana for monitoring access
+      - proxy
 
   redis:
     image: redis:7-alpine

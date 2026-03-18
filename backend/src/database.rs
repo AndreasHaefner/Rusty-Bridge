@@ -44,13 +44,23 @@ impl DbConfig {
     pub async fn get_redis_conn(&self) -> Result<redis::aio::MultiplexedConnection, redis::RedisError> {
         self.redis.get_multiplexed_async_connection().await
     }
-   pub async fn redis_test_conn(&self) -> Result<(), redis::RedisError> {
-    Retry::spawn(Self::get_retry_strategy(), || async {
+  pub async fn redis_test_conn(&self) -> Result<(), redis::RedisError> {
+    use tokio::time::{timeout, Duration};
 
+    // Wir setzen ein hardes 5-Sekunden-Limit für den gesamten Test
+    let result = timeout(Duration::from_secs(5), async {
         let mut con = self.redis.get_multiplexed_async_connection().await?;
         let _: String = redis::cmd("PING").query_async(&mut con).await?;
         Ok::<(), redis::RedisError>(())
-    }).await
+    }).await;
+
+    match result {
+        Ok(res) => res, // Der Test lief durch (Erfolg oder Fehler)
+        Err(_) => {
+            panic!("❌ Redis-Verbindungstest hat ein Timeout (5s) erreicht!");
+        }
+    }
+
 }
 
     pub fn get_db(&self) -> &PgPool {

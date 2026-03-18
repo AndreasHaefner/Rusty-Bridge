@@ -1,10 +1,12 @@
 use shared::{Card, Suit, Rank, PlayerPosition, GamePhase, PlayerAction, PublicGameState}; 
 use serde::Deserialize;
 use rand::seq::SliceRandom;
+use uuid::Uuid;
 use std::collections::HashMap;
 use crate::game::lobby::{Lobby};
 use crate::database::DbConfig;
 use tokio::sync::{mpsc, Mutex};
+use crate::dto::{LobbyManager};
 
 pub struct Deck(pub Vec<Card>);
 
@@ -79,12 +81,11 @@ impl Default for GameState {
 }
 
 
-pub struct AppState {
-    pub db: DbConfig,
-    pub lobby: Mutex<Lobby>,
+pub struct ActiveGame {
     pub game_tx: mpsc::Sender<(PlayerPosition, PlayerAction)>,
-    pub game_rx: Mutex<Option<mpsc::Receiver<(PlayerPosition, PlayerAction)>>>,
 }
+
+
 /* 
 
 #[derive(Serialize)]

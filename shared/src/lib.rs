@@ -1,12 +1,14 @@
 use serde::{Serialize, Deserialize};
 use std::collections::HashMap;
+use uuid::Uuid;
 
+use std::fmt;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize,Hash)]
 pub enum Suit { Clubs, Diamonds, Hearts, Spades }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Hash)]
-#[serde(rename_all = "lowercase")] // Macht aus "Two" -> "two"
+#[serde(rename_all = "lowercase")] 
 pub enum Rank {
     Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten,
     Jack, Queen, King, Ace,
@@ -60,7 +62,12 @@ impl PlayerPosition {
 }
 
 
-
+impl fmt::Display for PlayerPosition {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        
+        write!(f, "{:?}", self)
+    }
+}
 
 
 
@@ -76,13 +83,11 @@ pub enum BiddingCommand {
     Bid { level: u8, suit: Suit },
 }
 
-// Befehle während der Spiel-Phase
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum PlayingCommand {
     PlayCard { card: Card },
 }
 
-// Das ist, was vom Client kommt (kein Phase-Feld nötig!)
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum PlayerAction {
@@ -90,7 +95,6 @@ pub enum PlayerAction {
     Bidding(BiddingCommand),
 }
 
-// Das ist, was der Client bekommt (autoritativer Status vom Backend)
 #[derive(Serialize)]
 pub struct ServerPush {
     pub current_phase: GamePhase,
@@ -99,15 +103,15 @@ pub struct ServerPush {
 }
 #[derive(Serialize)]
 pub struct GameUpdateData {
-    pub table_cards: HashMap<PlayerPosition, Card>, // Was liegt aktuell auf dem Tisch?
-    pub last_action: Option<ActionInfo>,            // Wer hat was gemacht? (für Animationen)
-    pub scores: Vec<Score>,                         // Aktueller Punktestand
-    pub cards_left: CountCards,                          // Wie viele Karten hat der Spieler noch?
+    pub table_cards: HashMap<PlayerPosition, Card>, 
+    pub last_action: Option<ActionInfo>,       
+    pub scores: Vec<Score>,                         
+    pub cards_left: CountCards,                        
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum ActionInfo {
-    Action(PlayerPosition, PlayerAction), // "Nord hat Herz 10 gespielt"
+    Action(PlayerPosition, PlayerAction),
     StatusMessage(String),
 }
 #[derive(Serialize)]
@@ -129,3 +133,26 @@ pub struct PublicGameState {
     pub current_turn: PlayerPosition,
     pub phase: GamePhase,
 }
+
+
+
+#[derive(Deserialize, Serialize, Clone, PartialEq)]
+pub struct LobbyInfo {
+    pub id: Uuid,
+    pub name: String,
+    pub players_count: u8,
+}
+
+
+#[derive(Serialize, Deserialize)]
+pub struct IdResponse {
+    pub id: Uuid,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AuthData {
+    pub user_id: Uuid,
+    pub session_token: String,
+}
+
+

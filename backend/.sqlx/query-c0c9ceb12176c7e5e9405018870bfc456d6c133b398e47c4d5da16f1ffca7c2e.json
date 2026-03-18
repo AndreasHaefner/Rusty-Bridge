@@ -1,0 +1,32 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT l.id, \n               u.username as \"master_name?\", -- Das \"?\" sagt sqlx: \"Kann NULL sein\"\n               (SELECT COUNT(*) FROM players p WHERE p.lobby_id = l.id) as \"player_count!\"\n        FROM lobbies l\n        LEFT JOIN users u ON l.master_id = u.id\n        WHERE l.status = 'pending'\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "master_name?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "player_count!",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      true,
+      false,
+      null
+    ]
+  },
+  "hash": "c0c9ceb12176c7e5e9405018870bfc456d6c133b398e47c4d5da16f1ffca7c2e"
+}

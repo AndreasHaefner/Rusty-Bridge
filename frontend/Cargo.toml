@@ -5,9 +5,9 @@ edition = "2024"
 
 [dependencies]
 # Das Web-Framework
-leptos = { version = "^0.8", features = ["csr"] }
+leptos = { version = "0.8", features = ["csr"] }
 leptos-use = "0.18"
-# Deine eigene Logik von oben
+leptos_router = "0.8"
 shared = { path = "../shared" }
 gloo-net = "0.6"
 wasm-bindgen = "0.2"
@@ -22,3 +22,7 @@ serde_json ={ version = "1.0"}
 codee = { version = "0.3" }
 bytes = "1.0"
 serde = "1"
+uuid = { version = "1.21", features = ["v4", "serde", "js"] }
+
+
+reqwest = { version = "0.13", features = ["json"] }
