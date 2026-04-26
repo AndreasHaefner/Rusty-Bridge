@@ -70,17 +70,83 @@ impl fmt::Display for PlayerPosition {
 }
 
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum GamePhaseData {
+    Bidding(BiddingState),
+    Playing(PlayingState),
+    Finished { winner_team: Team, score: i32 },
+}
 
-#[derive(Serialize,Deserialize,  Debug, Clone)]
-pub enum GamePhase {
-    Bidding,
-    Playing,
-    Finished,
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum Team{
+    NordSouth,
+    EastWest
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+pub struct BiddingState {
+    pub history: Vec<(PlayerPosition, BiddingCommand)>,
+    pub highest_bid: Option<Bid>,
+    pub highest_bidder: Option<PlayerPosition>,
+    pub consecutive_passes: u8,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct PlayingState {
+    pub contract: Bid,
+    pub is_doubled: bool,
+    pub is_redoubled: bool,
+    pub declarer: PlayerPosition,
+    pub dummy: PlayerPosition,
+    pub table: HashMap<PlayerPosition, Card>,
+    pub tricks_won_ns: u8,
+    pub tricks_won_ew: u8,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum BidLevel{
+    One =1,
+    Two = 2,
+    Three = 3,
+    Four = 4,
+    Five = 5,
+    Six = 6,
+    Seven = 7
+}
+impl BidLevel {
+    pub fn val(&self) -> u8 {
+        self.clone() as u8
+    }
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct Bid{
+     level: BidLevel, 
+     suit: Option<Suit> 
+}
+
+impl Bid {
+    pub fn value(&self) -> u8 {
+        let suit_value = match self.suit {
+            Some(Suit::Clubs) => 0,
+            Some(Suit::Diamonds) => 1,
+            Some(Suit::Hearts) => 2,
+            Some(Suit::Spades) => 3,
+            None => 4,
+        };
+        (self.level.val() * 5) + suit_value     
+    }
+
+    pub fn is_higher_than(&self, other: &Bid) -> bool {
+        self.value() > other.value()
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum BiddingCommand {
-    Bid { level: u8, suit: Suit },
+    MakeBid{bid: Bid},
+    Pass,
+    Redouble,
+    Double
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -97,7 +163,7 @@ pub enum PlayerAction {
 
 #[derive(Serialize)]
 pub struct ServerPush {
-    pub current_phase: GamePhase,
+    pub current_phase: GamePhaseData,
     pub current_turn: PlayerPosition,
     pub update_data: GameUpdateData,
 }
@@ -131,7 +197,7 @@ pub struct PublicGameState {
     pub my_hand: Vec<Card>,
     pub table: HashMap<PlayerPosition, Card>,
     pub current_turn: PlayerPosition,
-    pub phase: GamePhase,
+    pub phase: GamePhaseData,
 }
 
 

@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use tokio::sync::mpsc;
 use shared::{Card, PlayerPosition, PlayerAction, PlayingCommand, PublicGameState};
-use crate::game::models::{GameState };
+use crate::{dto::Player, game::models::GameState};
 
 
 type PlayerSenders = HashMap<PlayerPosition, mpsc::UnboundedSender<PublicGameState>>;
@@ -34,15 +34,15 @@ pub async fn game_loop(
         }
     }
 }
-pub fn process_play_card(state: &mut GameState, player: PlayerPosition, card: Card) -> Result<(), String> {
-    
+pub fn process_play_card(state: &mut GameState, player_position: PlayerPosition, card: Card) -> Result<(), String> {
 
-    if state.current_player != player {
+
+    if state.current_player != player_position {
         return Err("Du bist nicht am Zug!".to_string());
     }
 
 
-    let hand = state.hands.get_mut(&player).ok_or("Spieler hat keine Hand")?;
+    let hand = state.hands.get_mut(&player_position).ok_or("Spieler hat keine Hand")?;
     
     //find and remove the card from the hand here
     if let Some(pos) = hand.iter().position(|c| c == &card) {
@@ -51,7 +51,7 @@ pub fn process_play_card(state: &mut GameState, player: PlayerPosition, card: Ca
         return Err("Karte nicht auf der Hand gefunden!".to_string());
     }
 
-    state.table.insert(player, card);
+    state.table.insert(player_position, card);
     state.current_player = state.current_player.next();
 
     Ok(())

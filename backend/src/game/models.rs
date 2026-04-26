@@ -1,4 +1,4 @@
-use shared::{Card, Suit, Rank, PlayerPosition, GamePhase, PlayerAction, PublicGameState}; 
+use shared::{Bid, BiddingCommand, BiddingState, Card, GamePhaseData, PlayerAction, PlayerPosition, PublicGameState, Rank, Suit}; 
 use serde::Deserialize;
 use rand::seq::SliceRandom;
 use uuid::Uuid;
@@ -45,7 +45,19 @@ pub struct GameState {
     pub table: HashMap<PlayerPosition, Card>,
     pub current_player: PlayerPosition,
     pub pot: i32,
-    pub phase: GamePhase,
+    //pub phase: GamePhase,
+
+    pub phase: GamePhaseData,
+
+    //Bidding, maybe in other state Todo
+   /*pub bidding_history: Vec<(PlayerPosition, BiddingCommand)>,
+    pub highest_bid: Option<Bid>,
+    pub highest_bidder: Option<PlayerPosition>,
+    pub consecutive_passes: u8,
+    pub is_doubled: bool,
+    pub is_redoubled: bool,
+    pub bidding_finished: bool,
+     */ 
 }
 impl GameState {
     pub fn for_player(&self, player: PlayerPosition) -> PublicGameState {
@@ -75,7 +87,7 @@ impl Default for GameState {
             table: HashMap::new(),
             current_player: PlayerPosition::North,
             pot: 0,
-            phase: GamePhase::Playing,
+            phase: GamePhaseData::Bidding(BiddingState::default()),
         }
     }
 }
