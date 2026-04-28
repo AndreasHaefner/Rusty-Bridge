@@ -56,39 +56,35 @@ impl LobbyManager {
 }
 
     pub async fn create_lobby(&self, creator: User) -> Result<Uuid, sqlx::Error> {
-    let rec = sqlx::query!(
-        "INSERT INTO lobbies (status) VALUES ($1) RETURNING id",
-        "pending"
-    )
-    .fetch_one(&self.db)
-    .await?;
+        let rec = sqlx::query!(
+            "INSERT INTO lobbies (master_id, status) VALUES ($1, $2) RETURNING id",
+            creator.id,
+            "pending"
+        )
+        .fetch_one(&self.db)
+        .await?;
 
-    let rec = sqlx::query!(
-    "INSERT INTO lobbies (master_id, status) VALUES ($1, $2) RETURNING id",
-    creator.id,
-    "pending"
-    )
-    .fetch_one(&self.db)
-    .await?;
+        let mut players = HashMap::new();
+        let pos = PlayerPosition::North; 
+        
+        players.insert(creator.id, Player::from_user(creator.clone(), pos));
 
+        sqlx::query!(
+            "INSERT INTO players (lobby_id, user_id, position) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING",
+            rec.id, creator.id, pos.to_string()
+        ).execute(&self.db).await?;
 
-    
-    let mut players = HashMap::new();
-    let pos = PlayerPosition::all()[0]; 
-    
-    players.insert(creator.id, Player::from_user(creator.clone(), pos));
-
-    let (game_tx, _) = mpsc::channel(100);
+        let (game_tx, _) = mpsc::channel(100);
         let mut games = self.active_games.lock().await;
-    games.insert(rec.id, Lobby {
-        lobby_id: rec.id,
-        lobby_master: Player::from_user(creator, pos),
-        players,
-        game_tx,
-    });
+        games.insert(rec.id, Lobby {
+            lobby_id: rec.id,
+            lobby_master: Player::from_user(creator, pos),
+            players,
+            game_tx,
+        });
 
-    Ok(rec.id)
-}
+        Ok(rec.id)
+    }
 
 
 
@@ -151,7 +147,6 @@ pub async fn get_active_lobbies(&self) -> Result<Vec<LobbyInfo>, sqlx::Error> {
 
     Ok(rows.into_iter().map(|row| LobbyInfo {
         id: row.id.expect("invalid row id vom db"), 
-        // Sicherer Umgang mit dem Option<String>
         name: format!("Tisch von {}", row.master_name.as_deref().unwrap_or("Unbekannt")),
         players_count: row.player_count as u8,
     }).collect())

@@ -67,6 +67,7 @@ impl GameState {
             table: self.table.clone(),
             current_turn: self.current_player, 
             phase: self.phase.clone(),
+            your_pos: player,
         }
     }
 }

@@ -50,7 +50,7 @@ async fn handle_socket(socket: WebSocket, state: Arc<AppState>, lobby_id: Uuid, 
 
     println!("Spieler auf Position {:?} der Lobby {} beigetreten.", my_pos, lobby_id);
 
-    // Loppy full, start game
+    // Lobby full, start game
     if is_full {
         println!("🎉 Tisch {} ist voll! Initialisiere Spiel...", lobby_id);
         
@@ -86,6 +86,9 @@ async fn handle_socket(socket: WebSocket, state: Arc<AppState>, lobby_id: Uuid, 
                 if let Some(game_tx) = state_clone.lobby_manager.get_game_tx(lobby_id).await {
                     let _ = game_tx.send((my_pos, action)).await;
                 }
+            }
+            else {
+                eprintln!("Error parsing WebSocket command: {}", text); 
             }
         }
     });

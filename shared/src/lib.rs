@@ -74,7 +74,7 @@ impl fmt::Display for PlayerPosition {
 pub enum GamePhaseData {
     Bidding(BiddingState),
     Playing(PlayingState),
-    Finished { winner_team: Team, score: i32 },
+    Finished { winner_team: Option<Team>, score: i32 },
 }
 
 
@@ -90,6 +90,9 @@ pub struct BiddingState {
     pub highest_bid: Option<Bid>,
     pub highest_bidder: Option<PlayerPosition>,
     pub consecutive_passes: u8,
+    pub bidding_finished: bool,
+    pub is_doubled: bool,
+    pub is_redoubled: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -120,8 +123,8 @@ impl BidLevel {
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Bid{
-     level: BidLevel, 
-     suit: Option<Suit> 
+     pub level: BidLevel, 
+     pub suit: Option<Suit> 
 }
 
 impl Bid {
@@ -198,6 +201,7 @@ pub struct PublicGameState {
     pub table: HashMap<PlayerPosition, Card>,
     pub current_turn: PlayerPosition,
     pub phase: GamePhaseData,
+     pub your_pos: PlayerPosition, 
 }
 
 

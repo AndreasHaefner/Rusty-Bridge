@@ -73,7 +73,6 @@ impl UserManager {
             account_type: AccountType::Anonymous,
         })
     }
-    // In user_manager.rs
     pub async fn create_session(&self, user_id: Uuid, token: &str) -> Result<(), sqlx::Error> {
     sqlx::query!(
         "INSERT INTO sessions (token, user_id, expires_at) VALUES ($1, $2, NOW() + INTERVAL '7 days')",

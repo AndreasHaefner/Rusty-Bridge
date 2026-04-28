@@ -21,6 +21,9 @@ pull-all:
 deploy:
 	docker stack deploy -c rusty-bridge-deploy.yaml rust-bridge
 
+remove:
+	docker stack rm rust-bridge
+
 re-deploy:
 	docker stack rm rust-bridge
 	docker stack deploy -c rusty-bridge-deploy.yaml rust-bridge

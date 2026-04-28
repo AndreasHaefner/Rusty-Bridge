@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use tokio::sync::mpsc;
-use shared::{Card, PlayerPosition, PlayerAction, PlayingCommand, PublicGameState};
-use crate::{dto::Player, game::models::GameState};
+use shared::{Card, GamePhaseData, PlayerAction, PlayerPosition, PlayingCommand, PlayingState, PublicGameState};
+use crate::{dto::Player, game::{self, bidding, models::GameState}};
 
 
 type PlayerSenders = HashMap<PlayerPosition, mpsc::UnboundedSender<PublicGameState>>;
@@ -18,8 +18,20 @@ pub async fn game_loop(
             PlayerAction::Playing(PlayingCommand::PlayCard { card }) => {
                 process_play_card(&mut state, player, card)
             },
-            PlayerAction::Bidding(_bid_cmd) => { 
-                Ok(())
+            PlayerAction::Bidding(bid_cmd) => { 
+                
+           let res = game::process_bid(&mut state, player, bid_cmd);
+            if res.is_ok() {
+                let finished = matches!(
+                    &state.phase,
+                    GamePhaseData::Bidding(bs) if bs.bidding_finished
+                );
+                if finished {
+                    println!("Bidding beendet. Initialisiere Playing-Phase...");
+                    bidding::finalize_bidding(&mut state);
+                }
+            }
+            res
             }
         };
 

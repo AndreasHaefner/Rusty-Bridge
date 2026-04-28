@@ -9,7 +9,7 @@ use axum::{
 use tower_cookies::{Cookie, Cookies, cookie::SameSite};
 use uuid::Uuid;
 use std::sync::Arc;
-use shared::LobbyInfo; // Gehe davon aus, dass das dein Struct aus dem Frontend ist
+use shared::LobbyInfo; 
 
 use crate::{helper::CurrentUser, state::AppState};
 
@@ -18,39 +18,37 @@ pub async fn guest_login_handler(
     State(state): State<Arc<AppState>>,
     cookies: Cookies,
 ) -> impl IntoResponse {
-    // 1. Anonymen User in DB erstellen
+    // Creates anonymous User in DB
     let user = match state.user_manager.create_anonymous_user().await {
         Ok(u) => u,
         Err(_) => return StatusCode::INTERNAL_SERVER_ERROR.into_response(),
     };
 
-    // 2. Token generieren (einfach eine neue UUID als String)
     let token = Uuid::new_v4().to_string();
 
-    // 3. Session in der DB speichern
     if state.user_manager.create_session(user.id, &token).await.is_err() {
         return StatusCode::INTERNAL_SERVER_ERROR.into_response();
     }
-// Im guest_login_handler
+
 let mut token_cookie = Cookie::new("session_token", token);
 token_cookie.set_path("/");
 token_cookie.set_same_site(SameSite::Lax);
 cookies.add(token_cookie);
 
-// HIER: Der fehlende Cookie für den Extraktor
+
 let mut user_id_cookie = Cookie::new("user_id", user.id.to_string());
 user_id_cookie.set_path("/");
 user_id_cookie.set_same_site(SameSite::Lax);
 cookies.add(user_id_cookie);
 
-    // Wir senden einfach ein OK zurück. Das Frontend navigiert dann zu /hub.
+    // We send Ok here - Fe will reroute to /hub
     StatusCode::OK.into_response()
 }
 
 // POST /api/lobbies
 pub async fn create_lobby_handler(
     State(state): State<Arc<AppState>>,
-    CurrentUser(current_user): CurrentUser, // Schützt die Route: Nur User mit Cookie dürfen das!
+    CurrentUser(current_user): CurrentUser, 
 ) -> impl IntoResponse {
     match state.lobby_manager.create_lobby(current_user).await {
         // Das Frontend erwartet den neuen lobby_id String als Textantwort
@@ -86,7 +84,7 @@ pub async fn list_lobbies_handler(State(state): State<Arc<AppState>>) -> impl In
             Json(lobbies).into_response()
         },
         Err(e) => {
-            eprintln!("DB-Fehler in list_lobbies: {:?}", e); // HIER siehst du den echten Fehler!
+            eprintln!("DB-Fehler in list_lobbies: {:?}", e); // Error Logging
             StatusCode::INTERNAL_SERVER_ERROR.into_response()
         },
     }

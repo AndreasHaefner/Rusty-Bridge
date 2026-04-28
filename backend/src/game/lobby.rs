@@ -22,7 +22,7 @@ impl Lobby {
                 return Some(pos);
             }
         }
-        None // Lobby voll
+        None // Lobby full, can't add anything
     }
 
     pub fn is_full(&self) -> bool {

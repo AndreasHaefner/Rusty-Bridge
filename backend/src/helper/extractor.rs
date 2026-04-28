@@ -19,10 +19,10 @@ where
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
         let state = Arc::from_ref(state);
         
-        // Hole die Cookies aus dem Request
+        // Get Cookie From Request
         let cookies = Cookies::from_request_parts(parts, &state).await.map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
         
-        // Extrahiere UserID und Token aus den Cookies
+        // Extract UserID and Token from Cookie
         let user_id_str = cookies.get("user_id").map(|c| c.value().to_string()).ok_or(StatusCode::UNAUTHORIZED)?;
         let token = cookies.get("session_token").map(|c| c.value().to_string()).ok_or(StatusCode::UNAUTHORIZED)?;
         
