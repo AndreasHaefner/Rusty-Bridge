@@ -123,7 +123,7 @@ pub fn finalize_bidding(state: &mut GameState) {
         let declarer = determine_declarer(bidding_state);
         
         // Dummy is the player on the team of the declarer
-        let dummy = declarer.next().next(); 
+        let dummy = declarer.partner(); 
 
         state.phase = GamePhaseData::Playing(PlayingState {
             contract: final_bid,
@@ -131,9 +131,9 @@ pub fn finalize_bidding(state: &mut GameState) {
             is_redoubled: bidding_state.is_redoubled,
             declarer,
             dummy,
-            table: std::collections::HashMap::new(),
             tricks_won_ns: 0,
             tricks_won_ew: 0,
+            trick_lead: declarer.next(),
         });
 
         // The Player to the left of declarer starts the game

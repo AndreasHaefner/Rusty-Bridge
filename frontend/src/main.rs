@@ -245,22 +245,22 @@ fn BiddingView(state: BiddingState, current_turn: PlayerPosition, on_action: Cal
 }
 
 #[component]
-fn PlayingView(state: PlayingState) -> impl IntoView {
+fn PlayingView(playState: PlayingState, pubState: PublicGameState) -> impl IntoView {
     view! {
         <div class="playing-view">
             <h3>"Spielphase"</h3>
             <div class="contract-info">
-                <strong>"Kontrakt: "</strong> {format_bid(&state.contract)}
-                " von " <strong>{format!("{:?}", state.declarer)}</strong>
+                <strong>"Kontrakt: "</strong> {format_bid(&playState.contract)}
+                " von " <strong>{format!("{:?}", playState.declarer)}</strong>
             </div>
             
             <div class="table-view">
                 <h4>"Tisch (Gespielte Karten)"</h4>
                 <div class="played-cards">
-                    {if state.table.is_empty() {
+                    {if pubState.table.is_empty() {
                         view! { <p>"Noch keine Karten auf dem Tisch."</p> }.into_any()
                     } else {
-                        state.table.into_iter().map(|(pos, card)| {
+                        pubState.table.into_iter().map(|(pos, card)| {
                             let color = match card.suit {
                                 Suit::Hearts | Suit::Diamonds => "#d32f2f", _ => "#212121",
                             };
@@ -279,8 +279,8 @@ fn PlayingView(state: PlayingState) -> impl IntoView {
             </div>
 
             <div class="tricks-info">
-                <span>"Stiche N/S: " <strong>{state.tricks_won_ns}</strong></span>
-                <span>" | E/W: " <strong>{state.tricks_won_ew}</strong></span>
+                <span>"Stiche N/S: " <strong>{playState.tricks_won_ns}</strong></span>
+                <span>" | E/W: " <strong>{playState.tricks_won_ew}</strong></span>
             </div>
         </div>
     }
@@ -329,7 +329,7 @@ let ws = use_websocket::<PlayerAction, PublicGameState, JsonSerdeCodec>(&ws_url(
                     <BiddingView state=bs current_turn=s.current_turn on_action=on_action /> 
                 }.into_any(),
                 GamePhaseData::Playing(ps) => view! { 
-                    <PlayingView state=ps /> 
+                    <PlayingView playState=ps pubState=s.clone() /> 
                 }.into_any(),
                 GamePhaseData::Finished { winner_team, score } => view! { 
                     <div class="finished-view">

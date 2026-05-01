@@ -68,7 +68,21 @@ impl GameState {
             current_turn: self.current_player, 
             phase: self.phase.clone(),
             your_pos: player,
+            dummy_hand: self.visible_dummy_hand(),
         }
+    }
+    
+    fn visible_dummy_hand(&self) -> Option<Vec<Card>> {
+        let GamePhaseData::Playing(ps) = &self.phase else {
+            return None;
+        };
+
+        let trick_has_started = !self.table.is_empty()
+            || ps.tricks_won_ns > 0
+            || ps.tricks_won_ew > 0;
+
+        trick_has_started
+            .then(|| self.hands.get(&ps.dummy).cloned())?
     }
 }
 impl Default for GameState {

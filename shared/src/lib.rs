@@ -102,9 +102,9 @@ pub struct PlayingState {
     pub is_redoubled: bool,
     pub declarer: PlayerPosition,
     pub dummy: PlayerPosition,
-    pub table: HashMap<PlayerPosition, Card>,
     pub tricks_won_ns: u8,
     pub tricks_won_ew: u8,
+    pub trick_lead: PlayerPosition,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum BidLevel{
@@ -198,10 +198,11 @@ pub struct CountCards {
 pub struct PublicGameState {
     pub pot: i32,
     pub my_hand: Vec<Card>,
+    pub dummy_hand: Option<Vec<Card>>, 
     pub table: HashMap<PlayerPosition, Card>,
     pub current_turn: PlayerPosition,
     pub phase: GamePhaseData,
-     pub your_pos: PlayerPosition, 
+    pub your_pos: PlayerPosition, 
 }
 
 
