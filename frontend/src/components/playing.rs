@@ -103,7 +103,7 @@ pub fn PlayingView(
 
             <div class="field-middle">
                 <div class="field-west">{render(pos_left, true)}</div>
-                <table::TableView table=pub_state.table.clone() />
+                <table::TableView table=pub_state.table.clone() your_pos=your_pos />
                 <div class="field-east">{render(pos_right, true)}</div>
             </div>
 
