@@ -36,6 +36,8 @@ docker stack deploy -c ./rusty-bridge-deploy.yaml rust-bridge
 echo "Wechsle zurück zu lokal..."
 docker context use default
 
+#docker service logs rust-bridge_bridge_backend -f
+
 if [ $? -eq 0 ]; then
     echo "✅ Alles erledigt!"
 else

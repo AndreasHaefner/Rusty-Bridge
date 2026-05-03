@@ -74,7 +74,11 @@ pub fn process_play_card(
         .ok_or("Spieler hat keine Hand")?;
 
     // Check for suit played
-    let led_suit = state.table.values().next().map(|c| c.suit); // None on the first move on trick
+    let led_suit = if state.table.is_empty() {
+        None // None on the first move on trick
+    } else {
+        state.table.get(&playing_state.trick_lead).map(|c| c.suit)
+    }; 
 
     trick::validate_card_play(hand, &card, led_suit)?;
 

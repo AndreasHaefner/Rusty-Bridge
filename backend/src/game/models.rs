@@ -69,6 +69,10 @@ impl GameState {
             phase: self.phase.clone(),
             your_pos: player,
             dummy_hand: self.visible_dummy_hand(),
+            opponent_card_counts: self.hands.iter()
+                .filter(|(pos, _)| **pos != player)
+                .map(|(pos, cards)| (*pos, cards.len()))
+                .collect(),
         }
     }
     

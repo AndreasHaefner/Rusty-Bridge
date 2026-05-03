@@ -203,6 +203,7 @@ pub struct PublicGameState {
     pub current_turn: PlayerPosition,
     pub phase: GamePhaseData,
     pub your_pos: PlayerPosition, 
+    pub opponent_card_counts: HashMap<PlayerPosition, usize>,
 }
 
 
